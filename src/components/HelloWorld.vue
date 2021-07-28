@@ -1,58 +1,103 @@
 <template>
-  <div class="hello">
-    <h1>{{ msg }}</h1>
-    <p>
-      For a guide and recipes on how to configure / customize this project,<br>
-      check out the
-      <a href="https://cli.vuejs.org" target="_blank" rel="noopener">vue-cli documentation</a>.
-    </p>
-    <h3>Installed CLI Plugins</h3>
-    <ul>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-babel" target="_blank" rel="noopener">babel</a></li>
-      <li><a href="https://github.com/vuejs/vue-cli/tree/dev/packages/%40vue/cli-plugin-eslint" target="_blank" rel="noopener">eslint</a></li>
-    </ul>
-    <h3>Essential Links</h3>
-    <ul>
-      <li><a href="https://vuejs.org" target="_blank" rel="noopener">Core Docs</a></li>
-      <li><a href="https://forum.vuejs.org" target="_blank" rel="noopener">Forum</a></li>
-      <li><a href="https://chat.vuejs.org" target="_blank" rel="noopener">Community Chat</a></li>
-      <li><a href="https://twitter.com/vuejs" target="_blank" rel="noopener">Twitter</a></li>
-      <li><a href="https://news.vuejs.org" target="_blank" rel="noopener">News</a></li>
-    </ul>
-    <h3>Ecosystem</h3>
-    <ul>
-      <li><a href="https://router.vuejs.org" target="_blank" rel="noopener">vue-router</a></li>
-      <li><a href="https://vuex.vuejs.org" target="_blank" rel="noopener">vuex</a></li>
-      <li><a href="https://github.com/vuejs/vue-devtools#vue-devtools" target="_blank" rel="noopener">vue-devtools</a></li>
-      <li><a href="https://vue-loader.vuejs.org" target="_blank" rel="noopener">vue-loader</a></li>
-      <li><a href="https://github.com/vuejs/awesome-vue" target="_blank" rel="noopener">awesome-vue</a></li>
-    </ul>
+  <div id="app">
+    <div class="sendmsg">
+      <EditDiv v-model="inputmsg" @send="send" ref="inputmsg" />
+    </div>
+    <div @click="generate">
+      添加
+    </div>
+
   </div>
 </template>
-
 <script>
+import EditDiv from './EditDiv.vue'
+
 export default {
   name: 'HelloWorld',
-  props: {
-    msg: String
+   components: {
+    EditDiv
+  },
+  data() {
+    return {
+      inputmsg: '',
+      msglist: [],
+      index: 0,
+      tips: '',
+      atPerson:"成员"
+    };
+  },
+  watch: {
+    inputmsg: function(newVal,oldVal) {
+      // console.log('>>',newVal,oldVal);
+    }
+  },
+  methods: {
+    generate(){
+      this.$refs.inputmsg.addAt("所有人")
+    },
+    send() {
+      let blank =
+        this.inputmsg.split(' ').every(n => {
+          return /^(&nbsp;)+$/.test(n); // 针对空格为&nbsp;的情况
+        }) || this.inputmsg.trim().length === 0; // 普通空格的情况
+ 
+      if (blank) {
+        this.tips = '内容不能为空';
+        return;
+      }
+      this.msglist.push({
+        id: this.index++,
+        msg: this.inputmsg
+      });
+ 
+      this.inputmsg = '';
+      this.tips = '发送成功';
+      this.$nextTick(() => {
+        this.$refs.list.scrollTop = this.$refs.list.scrollHeight;
+      });
+    }
   }
-}
+};
 </script>
-
-<!-- Add "scoped" attribute to limit CSS to this component only -->
-<style scoped>
-h3 {
-  margin: 40px 0 0;
+<style>
+#app {
+  font-family: 'Avenir', Helvetica, Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  color: #2c3e50;
+  margin: 0 auto;
+  width: 1000px;
 }
-ul {
-  list-style-type: none;
-  padding: 0;
+::-webkit-scrollbar {
+  width: 4px;
+  height: 4px;
 }
-li {
-  display: inline-block;
-  margin: 0 10px;
+::-webkit-scrollbar-thumb {
+  background: rgba(48, 48, 48, 0);
+  border-radius: 5px;
+  height: 30px;
+  transition: all 0.4s ease-out;
 }
-a {
-  color: #42b983;
+/* 鼠标移入出现滚动条，移出隐藏效果 */
+.scroll-hover {
+  overflow: scroll;
+}
+.scroll-hover:hover::-webkit-scrollbar-thumb {
+  background: rgba(48, 48, 48, 0.4);
+}
+.sendmsg {
+  width: 300px;
+  line-height: 30px;
+  display: flex;
+}
+.inputm {
+  word-break: break-all;
+  width: 200px;
+  min-height: 40px;
+  resize: none;
 }
 </style>
+
+
+
+
